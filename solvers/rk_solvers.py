@@ -3,18 +3,21 @@
 import numpy as np
 from tqdm import tqdm
 
-def rk2(f, y0, h, times, params):
+def rk2(f, y0, h, dim, times, params):
   '''
-  Implements 2nd order Runge-Kutta.  
+  Implements 2nd order Runge-Kutta.   
 
-  Parameters:
+  Parameters:  
+
   - f: function(time, u), the RHS of the DE, returning (dim, 2) ndarray of derivatives
   - y0: ndarray of shape (dim, 2), initial condition 
   - h: float, time-step size
+  - dim: int, dimension of the prolem, used to initialize array for storage
   - times: tuple, (start, end)
   - params: parameters
-  - verbose: bool, indicates whether to print progress (for tracking)
-  Returns:
+  - verbose: bool, indicates whether to print progress (for tracking)  
+
+  Returns:  
   - y: ndarray of values computed at given times
   '''  
   start, end = times  
@@ -25,7 +28,7 @@ def rk2(f, y0, h, times, params):
   t_len = len(t_span)
   print(f"No. of time steps: {t_len}")
   # initialize array to store values time x dimension x 2
-  y = np.zeros((t_len, N+1, 2))
+  y = np.zeros((t_len, dim, 2))
 
   y[0] = y0  
 
@@ -39,17 +42,20 @@ def rk2(f, y0, h, times, params):
 
 
 
-def rk4(f, y0, h, times, params):
+def rk4(f, y0, h, dim, times, params):
   '''
   Implements 4th order Runge-Kutta.  
 
-  Parameters:
+  Parameters:  
+
   - f: function(time, u), the RHS of the DE, returning (dim, 2) ndarray of derivatives
   - y0: ndarray of shape (dim, 2), initial condition 
   - h: float, time-step size
+  - dim: int, dimension of the prolem, used to initialize array for storage
   - times: tuple, (start, end)
   - params: parameters
-  - verbose: bool, indicates whether to print progress (for tracking)
+  - verbose: bool, indicates whether to print progress (for tracking)  
+
   Returns:
   - y: ndarray of values computed at given times
   '''  
@@ -61,7 +67,7 @@ def rk4(f, y0, h, times, params):
   t_len = len(t_span)
   print(f"No. of time steps: {t_len}")
   # initialize array to store values time x dimension x 2
-  y = np.zeros((t_len, N+1, 2))
+  y = np.zeros((t_len, dim, 2))
 
   y[0] = y0   
   
