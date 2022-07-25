@@ -24,7 +24,6 @@ def feuler(f, c0, h, dim, times, params, verbose = True):
 
   start, end = times  
   t_span = np.arange(start, end, h)
-  N, a, b, c, p = params
 
   # length of time
   t_len = len(t_span)
@@ -38,7 +37,7 @@ def feuler(f, c0, h, dim, times, params, verbose = True):
   grads = [] 
 
   for i in tqdm(range(t_len-1)):
-    grad = f(y[i][0:N], y[i][-1:], a, b, c, p)
+    grad = f(y[i][0:N], y[i][-1:], params)
     grads.append(grad)
     y[i+1] = y[i] + h * grad
 
