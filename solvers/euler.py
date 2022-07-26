@@ -10,7 +10,7 @@ def feuler(f, c0, h, dim, times, params, verbose = True):
 
   Parameters:  
 
-    - f: function(time, u), the RHS of the DE, returning (N+1, 2) ndarray of derivatives
+    - f: function(y, params), the RHS of the DE, returning (N+1, 2) ndarray of derivatives
     - c0: ndarray of shape (dim, 2), initial condition 
     - h: float, time-step size
     - dim: int, dimension of the prolem, used to initialize array for storage
@@ -37,7 +37,7 @@ def feuler(f, c0, h, dim, times, params, verbose = True):
   grads = [] 
 
   for i in tqdm(range(t_len-1)):
-    grad = f(y[i][0:N], y[i][-1:], params)
+    grad = f(y[i], params)
     grads.append(grad)
     y[i+1] = y[i] + h * grad
 
