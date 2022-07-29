@@ -14,7 +14,7 @@ def expInit(N = 100,
     - N: int, the no. of prey, default 100   
     - style: string, 'ring' or 'random' initialization  
     - second_ord: bool, return a second order with velocity or not,
-                  if true, return with velocity zero
+                  if true, return with no velocity of predator
     - seed: int, to initialize
 
   Output:  
@@ -40,7 +40,10 @@ def expInit(N = 100,
                        [xpred, ypred], 
                        [0, 0]))  
     else:
-      out = np.vstack((coord_prey, [xpred, ypred]))  
+      out = np.vstack((coord_prey, 
+                       np.zeros_like(coord_prey), 
+                       [xpred, ypred] 
+                       ))  
       
   elif style == 'random':  
 
@@ -59,10 +62,14 @@ def expInit(N = 100,
                        [xpred, ypred], 
                        [0, 0]))  
     else:
-      out = np.vstack((coord_prey, [xpred, ypred]))  
+      out = np.vstack((coord_prey, 
+                       np.zeros_like(coord_prey), 
+                       [xpred, ypred] 
+                       )) 
   return out  
 
 def multiPlot(case,
+              axis_lim = None,
               second_order = True):
   '''
   Plots diagram given sampling times.  
@@ -73,26 +80,38 @@ def multiPlot(case,
       - h: time step size
       - sample_points: list, times to plot
       - size: int, fig size
-      - N: no. of prey  
+      - N: no. of prey   
+    - axis_lim: int, set limits of axes to [-n, n]
     - second_order: bool, return a second order with velocity or not,
-                    if true, return with velocity zero  
+                    if true, return with velocity zero   
   '''  
   soln, h, sample_points, size, N = case
   n = len(sample_points)
-  plt.figure(figsize=(size, size))
+  plt.figure(figsize=(size, size))  
+
   for j in range(n):  
+
     s = int(np.sqrt(n))+1
     ax = plt.subplot(s, s, j + 1)  
     i = int(sample_points[j] / h)
     i = i-1 if i>0 else 0
+
     if second_order:
       plt.scatter(soln[i][0:N, 0], soln[i][0:N, 1])
       plt.scatter(soln[i][2*N, 0], soln[i][2*N, 1])
-      plt.title(f'Time {sample_points[j]}')
-    else:
 
+      if axis_lim:
+        plt.xlim([-1 * axis_lim, axis_lim])
+        plt.ylim([-1 * axis_lim,axis_lim])
+
+      plt.title(f'Time {sample_points[j]}')
+
+    else:
       plt.scatter(soln[i][0:N, 0], soln[i][0:N, 1])
       plt.scatter(soln[i][-1, 0], soln[i][-1, 1])
-      # plt.xlim([-2,2])
-      # plt.ylim([-2,2])
+
+      if axis_lim:
+              plt.xlim([-1 * axis_lim, axis_lim])
+              plt.ylim([-1 * axis_lim,axis_lim])
+
       plt.title(f'Time {sample_points[j]}')
