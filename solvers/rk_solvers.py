@@ -69,10 +69,10 @@ def rk4(f, y0, h, dim, times, params):
   
   for i in tqdm(range(t_len-1)):
     k1 = f(y[i], params)
-    y1 = y[i] + (h/2) * k1
-    k2 = f(y1, params)
-    y2 = y[i] + (h/2) * k2
-    k3 = f(y2, params)
-    y[i+1] = y[i] + h * k3
-    
+    k2 = f(y[i] + (h/2) * k1, params)
+    k3 = f(y[i] + (h/2) * k2, params)
+    k4 = f(y[i] + h * k3, params)
+    k = (1/6) * (k1 + 2 * k2 + 2 * k3 + k4)
+    y[i+1] = y[i] + h * k
+
   return y
