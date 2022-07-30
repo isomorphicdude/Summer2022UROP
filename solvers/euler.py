@@ -4,7 +4,7 @@ import numpy as np
 from tqdm import tqdm
 
 
-def feuler(f, c0, h, dim, times, params, verbose = True):
+def feuler(f, c0, h, dim, times, params, verbose = False):
   '''
   Implements forward euler for 2D coordinates.   
 
