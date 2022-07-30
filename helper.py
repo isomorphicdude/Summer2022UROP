@@ -2,6 +2,9 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from solvers.rk_solvers import *
+from solvers.euler import *
+
 
 def expInit(N = 100,
              style = 'ring',
@@ -68,6 +71,7 @@ def expInit(N = 100,
                        )) 
   return out  
 
+
 def multiPlot(case,
               axis_lim = None,
               second_order = True):
@@ -114,4 +118,48 @@ def multiPlot(case,
               plt.xlim([-1 * axis_lim, axis_lim])
               plt.ylim([-1 * axis_lim,axis_lim])
 
-      plt.title(f'Time {sample_points[j]}')
+      plt.title(f'Time {sample_points[j]}')  
+
+
+def computeSoln(func, params, steps, times,
+                second_order = False,
+                init_sty = 'random', method = "rk4",
+                sample_points = [0.0, 0.6, 1.2, 1.8, 2.4, 3.0, 3.6],
+                size = 12):
+  '''
+  Computes solution and prints parameters.  
+
+  Parameters:
+    - func: function(y, params), the RHS of the DE, returning (dim, 2) ndarray of derivatives
+    - params: py dict, the parameter of function
+    - steps: int, no. of time steps
+    - times: tuple, (start, end)
+    - second_order: bool, indicates second order, defualt to False
+    - init_sty: string, initialization style, can be 'random' or 'ring', default 'random'
+    - method: string, solver to use, can be 'feuler', 'rk2', or 'rk4'
+    - sample_points: points at which the graph is drawn  
+    - size: size of plot  
+
+  Returns:  
+    - list containing solution
+  '''    
+
+  N = params['no. of prey']
+
+  start, end = times  
+  h = (end - start) / steps
+  c0 = expInit(N, init_sty, second_order=second_order)
+
+  if second_order:
+    dim = 2*N + 2
+  else:
+    dim = 2*N + 1
+
+  if method == 'rk4':  
+    y = rk4(func, c0, h, dim, times, params)
+  elif method == 'rk2':
+    y = rk2(func, c0, h, dim, times, params)
+  elif method == 'feuler':
+    y = feuler(func, c0, h, dim, times, params)
+
+  return [y, h, sample_points, size, N]
