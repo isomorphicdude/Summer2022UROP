@@ -5,7 +5,7 @@ import numpy as np
 def model0(y, params):
   '''
   Returns ndarray of shape (dim, 2) containing the derivatives
-  Uses second order for prey.   
+  with both predator and prey second order.    
   
   Input:   
     - y: an array containing the following inputs   
@@ -69,7 +69,8 @@ def model0(y, params):
 
 def model1(y, params):
   '''
-  Returns ndarray of shape (dim, 2) containing the derivatives.   
+  Returns ndarray of shape (dim, 2) containing the derivatives
+  with prey second order and predator first order.     
   
   Input:   
     - y: an array containing the following inputs   
@@ -124,9 +125,11 @@ def model1(y, params):
   return np.concatenate((vprey, acc_prey, vpred))  
 
 
+
 def model3(y, params):
   '''
-  Returns ndarray of shape (dim, 2) containing the derivatives.   
+  Returns ndarray of shape (dim, 2) containing the derivatives,
+  with perception cone added.    
   
   Input:   
     - y: an array containing the following inputs   
@@ -134,14 +137,15 @@ def model3(y, params):
       - vprey: ndarray of (N,2), the velocities of the prey  
       - ppred: ndarray of (1,2), the positions of the predator  
 
-    - params: py dict, extra parameters for the model (N, kh, a, b1, b2, p1, p2, angle, c, p) for now
+    - params: py dict, extra parameters for the model 
+              (N, kh, a, b1, b2, p1, p2, angle_prey, angle_pred, c, p)
 
   Returns:   
     - dy: ndarray of (2*N+1, 2), the derivatives of the inputs  
   '''  
 
   # unpacking parameters
-  N, kh, a, b1, b2, p1, p2, angle, c, p = params.values()
+  N, kh, a, b1, b2, p1, p2, a_h, a_p, c, p = params.values()
   # N, kh, a, b1, b2, c, p = params.values() 
 
   pprey = y[0:N]  
@@ -154,13 +158,13 @@ def model3(y, params):
   
   vel_prey  =  np.array([vprey[i] - np.delete(vprey, i, axis = 0) for i in range(N)])  
 
-  # perception cone
+  # perception cone for prey observing prey
   _vprey = vprey[:,np.newaxis,:] + np.zeros_like(dist_prey)
-  dot_prod = np.sum(_vprey*dist_prey, axis = 2)[:,:,np.newaxis]
+  dot_prod_h = np.sum(_vprey*dist_prey, axis = 2)[:,:,np.newaxis]
   norm_prey = np.linalg.norm(dist_prey, axis = 2)[:,:,np.newaxis]
-  abs_val  = np.linalg.norm(_vprey, axis=2)[:,:,np.newaxis] * norm_prey
-  mask = (dot_prod / abs_val)>=angle
-
+  abs_val_h  = np.linalg.norm(_vprey, axis=2)[:,:,np.newaxis] * norm_prey
+  mask_hh = (dot_prod_h / abs_val_h)>=a_h # (N,N-1,1)
+  
   # kernel of prey
   ker_prey = -1 * kh * vel_prey / (1 + (norm_prey**2))
   
@@ -170,17 +174,32 @@ def model3(y, params):
   # repulsion of prey
   rep_prey = b1 * dist_prey / (norm_prey**2)
                           
-  # repulsion of predator
+  # repulsion of predator (N,2)
   norm_pred = np.linalg.norm(pprey - ppred, axis = 1)[:,np.newaxis]
   rep_pred = b2 * (pprey - ppred) / (norm_pred**2)  
-
+  
+  # perception cone for prey observing predator (N,1)
+  mask_hp = (np.sum(vprey*(pprey-ppred), axis = 1)[:,np.newaxis] / (norm_pred * np.linalg.norm(vprey)))>=a_h
+  
   # acceleration of prey
-  acc_prey = (1/N) * np.sum((p2 + mask * (p1-p2)) * (ker_prey + attrac_prey + rep_prey), axis=1) + rep_pred  
+  acc_prey = (1/N) * np.sum((p2 + mask_hh * (p1-p2)) * (ker_prey + attrac_prey + rep_prey), axis=1) + \
+    rep_pred * mask_hp  
 
   # velocity of predator
   vpred = (1/N) * (c * np.sum((pprey - ppred) / (norm_pred**p), 
+                                 axis = 0))#[np.newaxis]  
+
+  # perception cone for predator observing prey 
+  # try implementing the perception cone by computed velocity
+  dot_prod_p = np.sum((ppred - pprey)*vpred, axis = 1)[:,np.newaxis]
+  abs_val_p  = norm_pred * np.linalg.norm(vpred)
+  mask_ph    = (dot_prod_p / abs_val_p) >= a_p
+  
+  # re-computed velocity of predator
+  vpred = (1/N) * (c * np.sum(((p2+(p1-p2)*mask_ph)*pprey - ppred) / (norm_pred**p), 
                                  axis = 0))[np.newaxis]
                                  
   return np.concatenate((vprey, acc_prey, vpred))
+  
   
   
