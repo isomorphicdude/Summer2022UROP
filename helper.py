@@ -74,24 +74,32 @@ def expInit(N = 100,
 
 def multiPlot(case,
               axis_lim = None,
-              second_order = True):
+              second_order = True,
+              quiver = False):
   '''
   Plots diagram given sampling times.  
   
   Parameters:
-    - case: a tuple containing the following
-      - soln: ndarray, solution  
+    - case: a tuple containing the following   
+      - soln: ndarray, solution of positions at different times
+              or (y, pred_vel) for quiver plot
       - h: time step size
       - sample_points: list, times to plot
       - size: int, fig size
       - N: no. of prey   
     - axis_lim: int, set limits of axes to [-n, n]
     - second_order: bool, return a second order with velocity or not,
-                    if true, return with velocity zero   
+                    if true, return with velocity zero    
+    - quiver: bool, return quiver plot when velocity is provided
   '''  
   soln, h, sample_points, size, N = case
   n = len(sample_points)
   plt.figure(figsize=(size, size))  
+
+  try:
+    soln, vel_pred = soln
+  except ValueError:
+    print("You are using just the positions.")
 
   for j in range(n):  
 
@@ -100,10 +108,23 @@ def multiPlot(case,
     i = int(sample_points[j] / h)
     i = i-1 if i>0 else 0
 
-    if second_order:
+    if second_order and not quiver:
       plt.scatter(soln[i][0:N, 0], soln[i][0:N, 1])
       plt.scatter(soln[i][2*N, 0], soln[i][2*N, 1])
 
+      if axis_lim:
+        plt.xlim([-1 * axis_lim, axis_lim])
+        plt.ylim([-1 * axis_lim,axis_lim])
+
+      plt.title(f'Time {sample_points[j]}')
+
+    if second_order and quiver:
+      plt.scatter(soln[i][0:N, 0], soln[i][0:N, 1])
+      plt.quiver([soln[i][0:N, 0]], [soln[i][0:N, 1]],
+                soln[i][N:2*N, 0], soln[i][N:2*N, 1])
+      plt.scatter(soln[i][2*N, 0], soln[i][2*N, 1])
+      plt.quiver([soln[i][2*N, 0]], [soln[i][2*N, 1]],
+                vel_pred[i][0], vel_pred[i][1])
       if axis_lim:
         plt.xlim([-1 * axis_lim, axis_lim])
         plt.ylim([-1 * axis_lim,axis_lim])
@@ -124,6 +145,7 @@ def multiPlot(case,
 def computeSoln(func, params, steps, times,
                 second_order = False,
                 init_sty = 'random', method = "rk4",
+                return_vel = True,
                 sample_points = [0.0, 0.6, 1.2, 1.8, 2.4, 3.0, 3.6],
                 size = 12):
   '''
@@ -160,6 +182,7 @@ def computeSoln(func, params, steps, times,
   elif method == 'rk2':
     y = rk2(func, c0, h, dim, times, params)
   elif method == 'feuler':
-    y = feuler(func, c0, h, dim, times, params)
+    y = feuler(func, c0, h, dim, times, params, 
+              return_vel=return_vel)
 
   return [y, h, sample_points, size, N]
