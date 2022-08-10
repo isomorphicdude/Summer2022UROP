@@ -1,6 +1,9 @@
 '''Collection of models.'''  
 
-import numpy as np
+import numpy as np  
+
+# model0 is not used in any of the notebooks thus some features in other models 
+# are not present in model0
 
 def model0(y, params):
   '''
