@@ -186,7 +186,7 @@ def model3(y, params):
   
   # acceleration of prey
   acc_prey = (1/N) * np.sum((p2 + mask_hh * (p1-p2)) * (ker_prey + attrac_prey + rep_prey), axis=1) + \
-    rep_pred * mask_hp  
+    rep_pred *(p2 + mask_hp * (p1-p2))  
 
   # velocity of predator
   vpred = (1/N) * (c * np.sum((pprey - ppred) / (norm_pred**p), 
