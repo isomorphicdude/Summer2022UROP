@@ -1,5 +1,6 @@
 '''Implements some auxiliary functions.'''  
 
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from solvers.rk_solvers import *
@@ -149,7 +150,7 @@ def exportPlot(case,
               quiver = False,
               export_dir = None):
   '''
-  Plots diagram given sampling times.  
+  Plots and exports diagram given sampling times.  
   
   Parameters:
     - case: a tuple containing the following   
@@ -165,9 +166,12 @@ def exportPlot(case,
     - quiver: bool, determine if return quiver plot when velocity is provided
     - export_dir: string, target directory for import
   '''  
-  soln, h, sample_points, size, N = case
+  soln, h, sample_points, N = case
   n = len(sample_points)
-  plt.figure(figsize=(size, size))  
+  fig, axes = plt.subplots(1,n, figsize = (n*size, size))
+  # abs_path = os.path.abspath(__file__)
+  # path = os.path.join(abs_path, export_dir)
+  # os.mkdir(path)
 
   try:
     soln, vel_pred = soln
@@ -179,37 +183,40 @@ def exportPlot(case,
     i = i-1 if i>0 else 0
 
     if second_order and not quiver:
-      plt.scatter(soln[i][0:N, 0], soln[i][0:N, 1])
-      plt.scatter(soln[i][2*N, 0], soln[i][2*N, 1])
+      axes[j].scatter(soln[i][0:N, 0], soln[i][0:N, 1])
+      axes[j].scatter(soln[i][2*N, 0], soln[i][2*N, 1])
 
       if axis_lim:
-        plt.xlim([-1 * axis_lim, axis_lim])
-        plt.ylim([-1 * axis_lim,axis_lim])
+        axes[j].xlim([-1 * axis_lim, axis_lim])
+        axes[j].ylim([-1 * axis_lim,axis_lim])
 
-      plt.title(f'Time {sample_points[j]}')
+      axes[j].set_title(f'Time {sample_points[j]}')
+
 
     if second_order and quiver:
-      plt.scatter(soln[i][0:N, 0], soln[i][0:N, 1])
-      plt.quiver([soln[i][0:N, 0]], [soln[i][0:N, 1]],
+      axes[j].scatter(soln[i][0:N, 0], soln[i][0:N, 1])
+      axes[j].quiver([soln[i][0:N, 0]], [soln[i][0:N, 1]],
                 soln[i][N:2*N, 0], soln[i][N:2*N, 1])
-      plt.scatter(soln[i][2*N, 0], soln[i][2*N, 1])
-      plt.quiver([soln[i][2*N, 0]], [soln[i][2*N, 1]],
+      axes[j].scatter(soln[i][2*N, 0], soln[i][2*N, 1])
+      axes[j].quiver([soln[i][2*N, 0]], [soln[i][2*N, 1]],
                 vel_pred[i][0], vel_pred[i][1])
       if axis_lim:
-        plt.xlim([-1 * axis_lim, axis_lim])
-        plt.ylim([-1 * axis_lim,axis_lim])
+        axes[j].xlim([-1 * axis_lim, axis_lim])
+        axes[j].ylim([-1 * axis_lim,axis_lim])
 
-      plt.title(f'Time {sample_points[j]}')
+      axes[j].set_title(f'Time {sample_points[j]}')
 
     else:
-      plt.scatter(soln[i][0:N, 0], soln[i][0:N, 1])
-      plt.scatter(soln[i][-1, 0], soln[i][-1, 1])
+      axes[j].scatter(soln[i][0:N, 0], soln[i][0:N, 1])
+      axes[j].scatter(soln[i][-1, 0], soln[i][-1, 1])
 
       if axis_lim:
-        plt.xlim([-1 * axis_lim, axis_lim])
-        plt.ylim([-1 * axis_lim,axis_lim])
+        axes[j].xlim([-1 * axis_lim, axis_lim])
+        axes[j].ylim([-1 * axis_lim,axis_lim])
 
-      plt.title(f'Time {sample_points[j]}')  
+      axes[j].set_title(f'Time {sample_points[j]}')  
+  name = os.path.join(export_dir, f"{sample_points}.svg")
+  plt.savefig(name)
 
 
 
