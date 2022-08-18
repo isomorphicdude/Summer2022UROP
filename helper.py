@@ -73,6 +73,7 @@ def expInit(N = 100,
 
 
 def multiPlot(case,
+              size = 12,
               axis_lim = None,
               second_order = True,
               quiver = False):
@@ -85,14 +86,14 @@ def multiPlot(case,
               or (y, pred_vel) for quiver plot
       - h: time step size
       - sample_points: list, times to plot
-      - size: int, fig size
       - N: no. of prey   
+    - size: int, fig size
     - axis_lim: int, set limits of axes to [-n, n]
     - second_order: bool, return a second order with velocity or not,
                     if true, return with velocity zero    
-    - quiver: bool, return quiver plot when velocity is provided
+    - quiver: bool, determine if return quiver plot when velocity is provided
   '''  
-  soln, h, sample_points, size, N = case
+  soln, h, sample_points, N = case
   n = len(sample_points)
   plt.figure(figsize=(size, size))  
 
@@ -139,7 +140,77 @@ def multiPlot(case,
               plt.xlim([-1 * axis_lim, axis_lim])
               plt.ylim([-1 * axis_lim,axis_lim])
 
+      plt.title(f'Time {sample_points[j]}')    
+
+def exportPlot(case,
+              size = 4,
+              axis_lim = None,
+              second_order = True,
+              quiver = False,
+              export_dir = None):
+  '''
+  Plots diagram given sampling times.  
+  
+  Parameters:
+    - case: a tuple containing the following   
+      - soln: ndarray, solution of positions at different times
+              or (y, pred_vel) for quiver plot
+      - h: time step size
+      - sample_points: list, times to plot
+      - N: no. of prey  
+    - size: int, figsize
+    - axis_lim: int, set limits of axes to [-n, n]
+    - second_order: bool, return a second order with velocity or not,
+                    if true, return with velocity zero    
+    - quiver: bool, determine if return quiver plot when velocity is provided
+    - export_dir: string, target directory for import
+  '''  
+  soln, h, sample_points, size, N = case
+  n = len(sample_points)
+  plt.figure(figsize=(size, size))  
+
+  try:
+    soln, vel_pred = soln
+  except ValueError:
+    print("You are using just the positions.")
+
+  for j in range(n):  
+    i = int(sample_points[j] / h)
+    i = i-1 if i>0 else 0
+
+    if second_order and not quiver:
+      plt.scatter(soln[i][0:N, 0], soln[i][0:N, 1])
+      plt.scatter(soln[i][2*N, 0], soln[i][2*N, 1])
+
+      if axis_lim:
+        plt.xlim([-1 * axis_lim, axis_lim])
+        plt.ylim([-1 * axis_lim,axis_lim])
+
+      plt.title(f'Time {sample_points[j]}')
+
+    if second_order and quiver:
+      plt.scatter(soln[i][0:N, 0], soln[i][0:N, 1])
+      plt.quiver([soln[i][0:N, 0]], [soln[i][0:N, 1]],
+                soln[i][N:2*N, 0], soln[i][N:2*N, 1])
+      plt.scatter(soln[i][2*N, 0], soln[i][2*N, 1])
+      plt.quiver([soln[i][2*N, 0]], [soln[i][2*N, 1]],
+                vel_pred[i][0], vel_pred[i][1])
+      if axis_lim:
+        plt.xlim([-1 * axis_lim, axis_lim])
+        plt.ylim([-1 * axis_lim,axis_lim])
+
+      plt.title(f'Time {sample_points[j]}')
+
+    else:
+      plt.scatter(soln[i][0:N, 0], soln[i][0:N, 1])
+      plt.scatter(soln[i][-1, 0], soln[i][-1, 1])
+
+      if axis_lim:
+        plt.xlim([-1 * axis_lim, axis_lim])
+        plt.ylim([-1 * axis_lim,axis_lim])
+
       plt.title(f'Time {sample_points[j]}')  
+
 
 
 def computeSoln(func, params, steps, times,
@@ -147,7 +218,7 @@ def computeSoln(func, params, steps, times,
                 init_sty = 'random', method = "rk4",
                 return_vel = True,
                 sample_points = [0.0, 0.6, 1.2, 1.8, 2.4, 3.0, 3.6],
-                size = 12):
+                ):
   '''
   Computes solution and prints parameters.  
 
@@ -160,7 +231,6 @@ def computeSoln(func, params, steps, times,
     - init_sty: string, initialization style, can be 'random' or 'ring', default 'random'
     - method: string, solver to use, can be 'feuler', 'rk2', or 'rk4'
     - sample_points: points at which the graph is drawn  
-    - size: size of plot  
 
   Returns:  
     - list containing solution
@@ -185,4 +255,5 @@ def computeSoln(func, params, steps, times,
     y = feuler(func, c0, h, dim, times, params, 
               return_vel=return_vel)
 
-  return [y, h, sample_points, size, N]
+  return [y, h, sample_points, N]
+  
