@@ -148,7 +148,8 @@ def exportPlot(case,
               axis_lim = None,
               second_order = True,
               quiver = False,
-              export_dir = None):
+              export_dir = None,
+              fontsize = 40):
   '''
   Plots and exports diagram given sampling times.  
   
@@ -165,6 +166,7 @@ def exportPlot(case,
                     if true, return with velocity zero    
     - quiver: bool, determine if return quiver plot when velocity is provided
     - export_dir: string, target directory for import
+    - fontsize: int, fontsize of title, default 40
   '''  
   soln, h, sample_points, N = case
   n = len(sample_points)
@@ -190,7 +192,7 @@ def exportPlot(case,
         axes[j].xlim([-1 * axis_lim, axis_lim])
         axes[j].ylim([-1 * axis_lim,axis_lim])
 
-      axes[j].set_title(f'Time {sample_points[j]}')
+      axes[j].set_title(f'Time {sample_points[j]}', fontsize=fontsize)
 
 
     if second_order and quiver:
@@ -204,7 +206,7 @@ def exportPlot(case,
         axes[j].xlim([-1 * axis_lim, axis_lim])
         axes[j].ylim([-1 * axis_lim,axis_lim])
 
-      axes[j].set_title(f'Time {sample_points[j]}')
+      axes[j].set_title(f'Time {sample_points[j]}', fontsize=fontsize)
 
     else:
       axes[j].scatter(soln[i][0:N, 0], soln[i][0:N, 1])
@@ -214,7 +216,7 @@ def exportPlot(case,
         axes[j].xlim([-1 * axis_lim, axis_lim])
         axes[j].ylim([-1 * axis_lim,axis_lim])
 
-      axes[j].set_title(f'Time {sample_points[j]}')  
+      axes[j].set_title(f'Time {sample_points[j]}', fontsize=fontsize)  
   name = os.path.join(export_dir, f"{sample_points}.svg")
   plt.savefig(name)
 
