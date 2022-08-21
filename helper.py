@@ -149,8 +149,8 @@ def exportPlot(case,
               size = 4,
               axis_lim = None,
               second_order = True,
-              quiver = False,
-              export_dir = None,
+              quiver = True,
+              export_dir = 'plots',
               fontsize = 40):
   '''
   Plots and exports diagram given sampling times.  
@@ -167,7 +167,8 @@ def exportPlot(case,
     - second_order: bool, return a second order with velocity or not,
                     if true, return with velocity zero    
     - quiver: bool, determine if return quiver plot when velocity is provided
-    - export_dir: string, target directory for import
+              default is True
+    - export_dir: string, target directory for import, default is 'plots'
     - fontsize: int, fontsize of title, default 40
   '''  
   soln, h, N = case
