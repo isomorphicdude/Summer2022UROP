@@ -192,8 +192,8 @@ def exportPlot(case,
       axes[j].scatter(soln[i][2*N, 0], soln[i][2*N, 1])
 
       if axis_lim:
-        axes[j].xlim([-1 * axis_lim, axis_lim])
-        axes[j].ylim([-1 * axis_lim,axis_lim])
+        axes[j].set_xlim([-1 * axis_lim, axis_lim])
+        axes[j].set_ylim([-1 * axis_lim,axis_lim])
 
       axes[j].set_title(f'Time {sample_points[j]}', fontsize=fontsize)
 
@@ -206,8 +206,8 @@ def exportPlot(case,
       axes[j].quiver([soln[i][2*N, 0]], [soln[i][2*N, 1]],
                 vel_pred[i][0], vel_pred[i][1])
       if axis_lim:
-        axes[j].xlim([-1 * axis_lim, axis_lim])
-        axes[j].ylim([-1 * axis_lim,axis_lim])
+        axes[j].set_xlim([-1 * axis_lim, axis_lim])
+        axes[j].set_ylim([-1 * axis_lim,axis_lim])
 
       axes[j].set_title(f'Time {sample_points[j]}', fontsize=fontsize)
 
@@ -216,8 +216,8 @@ def exportPlot(case,
       axes[j].scatter(soln[i][-1, 0], soln[i][-1, 1])
 
       if axis_lim:
-        axes[j].xlim([-1 * axis_lim, axis_lim])
-        axes[j].ylim([-1 * axis_lim,axis_lim])
+        axes[j].set_xlim([-1 * axis_lim, axis_lim])
+        axes[j].set_ylim([-1 * axis_lim,axis_lim])
 
       axes[j].set_title(f'Time {sample_points[j]}', fontsize=fontsize)  
   name = os.path.join(export_dir, f"{sample_points}.svg")
