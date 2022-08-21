@@ -151,7 +151,8 @@ def exportPlot(case,
               second_order = True,
               quiver = True,
               export_dir = 'plots',
-              fontsize = 40):
+              fontsize = 40,
+              name = 'plot'):
   '''
   Plots and exports diagram given sampling times.  
   
@@ -170,6 +171,7 @@ def exportPlot(case,
               default is True
     - export_dir: string, target directory for import, default is 'plots'
     - fontsize: int, fontsize of title, default 40
+    - name: string, name of plot, default is 'plot'
   '''  
   soln, h, N = case
   n = len(sample_points)
@@ -220,7 +222,7 @@ def exportPlot(case,
         axes[j].set_ylim([-1 * axis_lim,axis_lim])
 
       axes[j].set_title(f'Time {sample_points[j]}', fontsize=fontsize)  
-  name = os.path.join(export_dir, f"{sample_points}.svg")
+  name = os.path.join(export_dir, f"{name}.svg")
   plt.savefig(name)
 
 
