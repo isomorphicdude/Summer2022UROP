@@ -12,14 +12,15 @@ def rk2(f, y0, h, dim, times, params, return_vel = True):
   - f: function(y, params), the RHS of the DE, returning (dim, 2) ndarray of derivatives
   - y0: ndarray of shape (dim, 2), initial condition 
   - h: float, time-step size
-  - dim: int, dimension of the prolem, used to initialize array for storage
+  - dim: int, dimension of the problem, used to initialize array for storage
   - times: tuple, (start, end)
   - params: parameters  
-  - return_vel: bool, indicates whether to return velocity of predator
+  - return_vel: bool, indicates whether to return velocity of predator, default to True
 
   Returns:  
   - y: ndarray of values computed at given times
   '''  
+
   start, end = times  
   t_span = np.arange(start, end, h)
 
@@ -33,6 +34,7 @@ def rk2(f, y0, h, dim, times, params, return_vel = True):
     extra = np.zeros((t_len, 2))
 
   y[0] = y0  
+
   if return_vel:
     for i in tqdm(range(t_len-1)):  
       k1 = f(y[i], params)
@@ -65,7 +67,7 @@ def rk4(f, y0, h, dim, times, params, return_vel = True):
   - dim: int, dimension of the prolem, used to initialize array for storage
   - times: tuple, (start, end)
   - params: parameters  
-  - return_vel: bool, indicates whether to return velocity of predator
+  - return_vel: bool, indicates whether to return velocity of predator, default to True
 
   Returns:  
   - y: ndarray of values computed at given times
