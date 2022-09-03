@@ -263,9 +263,9 @@ def computeSoln(func, params, steps, times,
     dim = 2*N + 1
 
   if method == 'rk4':  
-    y = rk4(func, c0, h, dim, times, params)
+    y = rk4(func, c0, h, dim, times, params, return_vel=return_vel)
   elif method == 'rk2':
-    y = rk2(func, c0, h, dim, times, params)
+    y = rk2(func, c0, h, dim, times, params, return_vel=return_vel)
   elif method == 'feuler':
     y = feuler(func, c0, h, dim, times, params, 
               return_vel=return_vel)
