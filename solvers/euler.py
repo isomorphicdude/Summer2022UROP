@@ -18,7 +18,7 @@ def feuler(f, c0, h, dim, times, params, verbose = False,
     - times: tuple, (start, end)
     - params: parameters (N,a,b,c,p)
     - verbose: bool, indicates whether to print progress (for tracking)  
-    - return_vel: bool, indicates whether to return velocity of predator
+    - return_vel: bool, indicates whether to return velocity of predator, default to True
 
   Returns:
     - y: ndarray of values of shape computed at given times
@@ -38,14 +38,11 @@ def feuler(f, c0, h, dim, times, params, verbose = False,
     extra = np.zeros((t_len, 2))
 
   y[0] = c0  
-  # a list storing the derivatives for debugging
-  # grads = [] 
 
   if return_vel:
     for i in tqdm(range(t_len-1)):
       grad = f(y[i], params)
       extra[i] = grad[-1]
-      # grads.append(grad)
       y[i+1] = y[i] + h * grad
 
       if verbose and i%100 == 0:
@@ -55,17 +52,10 @@ def feuler(f, c0, h, dim, times, params, verbose = False,
   else:
     for i in tqdm(range(t_len-1)):
       grad = f(y[i], params)
-      # grads.append(grad)
       y[i+1] = y[i] + h * grad
 
       if verbose and i%100 == 0:
         print(f"Iteration no. {i}")
     out = y  
 
-  # if derivatives become constant
-  # if verbose:
-  #   for j in range(t_len-2):
-  #     if (grads[j] == grads[j+1]).all():
-  #       print(j)
-  #       break
   return out
