@@ -10,7 +10,7 @@ from solvers.euler import *
 def expInit(N = 100,
              style = 'ring',
              second_order = True,
-             seed = 0):  
+             seed = None):  
   '''  
   Initializes prey and predator.
   
@@ -19,7 +19,7 @@ def expInit(N = 100,
     - style: string, 'ring' or 'random' initialization  
     - second_ord: bool, return a second order with velocity or not,
                   if true, return with no velocity of predator
-    - seed: int, to initialize
+    - seed: int, to initialize the conditions, default None
 
   Output:  
     - c0: (N+1, 2) ndarray if second_order is set to False, else 
@@ -27,8 +27,8 @@ def expInit(N = 100,
           position of predator, velocity of predator)
   '''  
   if style == 'ring':
-
-    np.random.seed(seed)
+    if seed is not None:
+      np.random.seed(seed)
     unit_interval = np.arange(0, 1, 1e-4)
     angles = 2 * np.pi * np.random.choice(unit_interval, size = N, replace = False)  
     R = np.random.uniform(0.25, 0.5, size = N)
@@ -50,8 +50,8 @@ def expInit(N = 100,
                        ))  
       
   elif style == 'random':  
-
-    np.random.seed(seed)
+    if seed is not None:
+      np.random.seed(seed)
     unit_interval = np.arange(0, 1, 1e-4) # values of x,y coordinates
     init = np.random.choice(unit_interval, size = 2*N+2, replace = False)
     xprey = init[0:N]  
@@ -230,7 +230,7 @@ def exportPlot(case,
 def computeSoln(func, params, steps, times,
                 second_order = False,
                 init_sty = 'random', method = "rk4",
-                return_vel = True
+                return_vel = True, seed = None
                 ):
   '''
   Computes solution and prints parameters.  
@@ -243,16 +243,19 @@ def computeSoln(func, params, steps, times,
     - second_order: bool, indicates second order, defualt to False
     - init_sty: string, initialization style, can be 'random' or 'ring', default 'random'
     - method: string, solver to use, can be 'feuler', 'rk2', or 'rk4'
+    - return_vel: bool, return velocity or not, default to True
+    - seed: int, seed for random number generator, default to None
 
   Returns:  
-    - list containing solution
+    - [y, h, N]: list, solution, time step size, and no. of prey
+                 if return_vel is True, solution is (y, velocity of both)
   '''    
 
   N = params['no. of prey']
 
   start, end = times  
   h = (end - start) / steps
-  c0 = expInit(N, init_sty, second_order=second_order)
+  c0 = expInit(N, init_sty, second_order=second_order, seed=seed)
 
   if second_order:
     dim = 2*N + 2
