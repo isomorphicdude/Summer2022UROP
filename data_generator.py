@@ -67,7 +67,7 @@ def generateData(model,
 
 	for i in range(num_data):
 		c0 = expInit(N, init_sty, second_order=second_order, seed=None)
-		tup = (model, c0, h, dim, times, params, return_vel)
+		tup = (model, c0, h, dim, times, params, return_vel, False)
 		args.append(tup)
 	try:
 		print("Trying to use multiprocessing...")
