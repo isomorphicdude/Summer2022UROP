@@ -4,8 +4,7 @@ import numpy as np
 from tqdm import tqdm
 
 
-def feuler(f, c0, h, dim, times, params, verbose = False,
-          return_vel = True):
+def feuler(f, c0, h, dim, times, params, return_vel = True, verbose = True):
   '''
   Implements forward euler for 2D coordinates.   
 
@@ -17,8 +16,8 @@ def feuler(f, c0, h, dim, times, params, verbose = False,
     - dim: int, dimension of the prolem, used to initialize array for storage
     - times: tuple, (start, end)
     - params: parameters (N,a,b,c,p)
-    - verbose: bool, indicates whether to print progress (for tracking)  
     - return_vel: bool, indicates whether to return velocity of predator, default to True
+    - verbose: bool, indicates whether to print progress, default to True
 
   Returns:
     - y: ndarray of values of shape computed at given times
@@ -30,17 +29,20 @@ def feuler(f, c0, h, dim, times, params, verbose = False,
 
   # length of time
   t_len = len(t_span)
-  print(f"No. of time steps: {t_len}")
+  if verbose:
+    print(f"No. of time steps: {t_len}")
 
   # initialize array to store values time x dimension x 2
   y = np.zeros((t_len, dim, 2))
   if return_vel:
     extra = np.zeros((t_len, 2))
 
-  y[0] = c0  
+  y[0] = c0    
+
+  iter = tqdm(range(t_len-1)) if verbose else range(t_len-1)
 
   if return_vel:
-    for i in tqdm(range(t_len-1)):
+    for i in iter:
       grad = f(y[i], params)
       extra[i] = grad[-1]
       y[i+1] = y[i] + h * grad
@@ -50,7 +52,7 @@ def feuler(f, c0, h, dim, times, params, verbose = False,
     out = (y, extra)
 
   else:
-    for i in tqdm(range(t_len-1)):
+    for i in iter:
       grad = f(y[i], params)
       y[i+1] = y[i] + h * grad
 

@@ -3,7 +3,7 @@
 import numpy as np
 from tqdm import tqdm
 
-def rk2(f, y0, h, dim, times, params, return_vel = True):
+def rk2(f, y0, h, dim, times, params, return_vel = True, verbose = True):
   '''
   Implements 2nd order Runge-Kutta.   
 
@@ -16,6 +16,7 @@ def rk2(f, y0, h, dim, times, params, return_vel = True):
   - times: tuple, (start, end)
   - params: parameters  
   - return_vel: bool, indicates whether to return velocity of predator, default to True
+  - verbose: bool, indicates whether to print progress, default to True
 
   Returns:  
   - y: ndarray of values computed at given times
@@ -26,17 +27,20 @@ def rk2(f, y0, h, dim, times, params, return_vel = True):
 
   # length of time
   t_len = len(t_span)
-  print(f"No. of time steps: {t_len}")
+  if verbose:
+    print(f"No. of time steps: {t_len}")
 
   # initialize array to store values time x dimension x 2
   y = np.zeros((t_len, dim, 2))
   if return_vel:
-    extra = np.zeros((t_len, 2))
+    extra = np.zeros((t_len, 2))  
+
+  iter = tqdm(range(t_len-1)) if verbose else range(t_len-1)
 
   y[0] = y0  
 
   if return_vel:
-    for i in tqdm(range(t_len-1)):  
+    for i in iter:  
       k1 = f(y[i], params)
       y1 = y[i] + (h/2) * k1
       grads = f(y1, params)
@@ -45,7 +49,7 @@ def rk2(f, y0, h, dim, times, params, return_vel = True):
       y[i+1] = y[i] + h * k2
     out = (y, extra)
   else:
-    for i in tqdm(range(t_len-1)):  
+    for i in iter:  
       k1 = f(y[i], params)
       y1 = y[i] + (h/2) * k1
       k2 = grads
@@ -55,7 +59,7 @@ def rk2(f, y0, h, dim, times, params, return_vel = True):
 
 
 
-def rk4(f, y0, h, dim, times, params, return_vel = True):
+def rk4(f, y0, h, dim, times, params, return_vel = True, verbose = True):
   '''
   Implements 4th order Runge-Kutta.  
 
@@ -68,6 +72,7 @@ def rk4(f, y0, h, dim, times, params, return_vel = True):
   - times: tuple, (start, end)
   - params: parameters  
   - return_vel: bool, indicates whether to return velocity of predator, default to True
+  - verbose: bool, indicates whether to print progress, default to True
 
   Returns:  
   - y: ndarray of values computed at given times
@@ -77,16 +82,19 @@ def rk4(f, y0, h, dim, times, params, return_vel = True):
 
   # length of time
   t_len = len(t_span)
-  print(f"No. of time steps: {t_len}")
+  if verbose:
+    print(f"No. of time steps: {t_len}")
   # initialize array to store values time x dimension x 2
   y = np.zeros((t_len, dim, 2))
   if return_vel:
     extra = np.zeros((t_len, 2))
 
   y[0] = y0   
+
+  iter = tqdm(range(t_len-1)) if verbose else range(t_len-1)
   
   if return_vel:
-    for i in tqdm(range(t_len-1)):
+    for i in iter:
       k1 = f(y[i], params)
       k2 = f(y[i] + (h/2) * k1, params)
       k3 = f(y[i] + (h/2) * k2, params)
@@ -97,7 +105,7 @@ def rk4(f, y0, h, dim, times, params, return_vel = True):
       y[i+1] = y[i] + h * k
     out = (y, extra)
   else:
-    for i in tqdm(range(t_len-1)):
+    for i in iter:
       k1 = f(y[i], params)
       k2 = f(y[i] + (h/2) * k1, params)
       k3 = f(y[i] + (h/2) * k2, params)
