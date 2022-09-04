@@ -52,7 +52,7 @@ def rk2(f, y0, h, dim, times, params, return_vel = True, verbose = True):
     for i in iter:  
       k1 = f(y[i], params)
       y1 = y[i] + (h/2) * k1
-      k2 = grads
+      k2 = f(y1, params)
       y[i+1] = y[i] + h * k2
     out = y
   return out
