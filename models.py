@@ -1,6 +1,12 @@
 '''Collection of models.'''  
 
+import warnings
 import numpy as np  
+
+warnings.filterwarnings("ignore", category=RuntimeWarning)
+
+# to turn warnings back on use the following
+# warnings.filterwarnings("default", category=RuntimeWarning)
 
 # model0 is not used in any of the notebooks thus some features in other models 
 # are not present in model0
