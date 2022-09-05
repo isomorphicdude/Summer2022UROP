@@ -27,29 +27,32 @@ def generateData(model,
                 second_order = False,
                 method = 'rk2',
                 return_vel = False,
-                cores = 2
-                ):  
-
+                cores = 2,
+				flattened = False
+                ):
 	"""  
-	Returns a tuple of the shape (2N+n+1, 2n(2N+1)).  
-	Args:     
-		- model: the model to use  
-		- num_data: int, no. of data points to generate  
-		- init_sty: str, 'random' or 'ring', default is 'random'  
-		- times: tuple, (start, end)  
-		- params: dict, parameters  
-		- steps: int, no. of time steps  
-		- second_order: bool, indicates whether to use second order predator, default False
-		- method: str, method to use  
-		- return_vel: bool, return velocity or not, default to False  
-		- cores: int, no. of cores to use    
+	Returns a tuple of the shape (2N+n+1, 2n(2N+1)).   
+
+	Args:    
+	- model: the model to use  
+	- num_data: int, no. of data points to generate  
+	- init_sty: str, 'random' or 'ring', default is 'random'  
+	- times: tuple, (start, end)  
+	- params: dict, parameters  
+	- steps: int, no. of time steps  
+	- second_order: bool, indicates whether to use second order predator, default False
+	- method: str, method to use  
+	- return_vel: bool, return velocity or not, default to False  
+	- cores: int, no. of cores to use    
+	- flattened: bool, indicates whether to return value as a one-dim vector  
+
 	Returns:    
-		- data: tuple, ((initial_val, times), (pos_prey, vel_prey, pos_pred))
+	- data: list of tuples, ((initial_val, times), (pos_prey, vel_prey, pos_pred)), 
+			when flattened=True, each element in the tuple is flattened  
 	"""  
 
 	# unpack parameters
 	N = params['no. of prey']
-	n = steps  
 	if cores>os.cpu_count():
 		raise ValueError("No. of cores cannot be greater than no. of available cores.")
 
@@ -58,8 +61,12 @@ def generateData(model,
 	# initialize 
 	start, end = times  
 	h = (end - start) / steps
-	args = [] # list of initial conditions
+
+	# use a list as constant time for accessing & appending
+	args = [] # list of arguments for mapping the function
+	init_vals = [] # initial values 
 	
+	# determines if it's second order
 	if second_order:
 		dim = 2*N + 2
 	else:
@@ -67,8 +74,11 @@ def generateData(model,
 
 	for i in range(num_data):
 		c0 = expInit(N, init_sty, second_order=second_order, seed=None)
+		init_vals.append(c0)
 		tup = (model, c0, h, dim, times, params, return_vel, False)
 		args.append(tup)
+
+	# multicore performance enhancement
 	try:
 		print("Trying to use multiprocessing...")
 		with Pool(cores) as p:
@@ -81,6 +91,7 @@ def generateData(model,
 			else:
 				raise ValueError("Invalid method.")
 		print("Multiprocessing successful.")
+
 	except:
 		print("Error in generating data using multiprocessing.")
 		print("Switching to single core...")
@@ -100,7 +111,13 @@ def generateData(model,
 			else:
 				raise ValueError("Invalid method.")
 
-	
-	return data
+	if flattened:
+		data = [np.ravel(val) for val in data]
+		init_vals = [np.ravel(val) for val in init_vals]
+
+
+	data = zip(init_vals, data)
+
+	return list(data)
 
 
