@@ -51,6 +51,7 @@ class GaussNewtonSolver(object):
             eps = 1e-4):
         """
         Fits the model.  
+        Every time fit is called, x,y are reset.  
 
         Args:
             - x: array-like, inputs, shape ((2N+1), ) one dimensional
@@ -88,13 +89,14 @@ class GaussNewtonSolver(object):
                                     max_iter=self.max_line)
 
             # update parameters
-            # print("Updating parameters")
             self.params = self.params + t * dk
-            print(t)
-            print(dk)
+
+            # if self.verbose:
+            print(f"The step size is {t}")
+            print(f"The descent direction is {dk}")
             
-            if self.verbose:
-                print(f"After trial {i+1}, parameters are {self.params}")
+            # if self.verbose:
+            print(f"After trial {i+1}, parameters are {self.params} \n")
             # terminate when gradient < tolerance eps
             if np.linalg.norm(self.loss_J) < eps:
                 print("Threshold reached!")
@@ -120,7 +122,7 @@ class GaussNewtonSolver(object):
         Returns:
             - t: float, final step size after searching
         """  
-        print("Starting Line Search")
+
         iter_cnt = 0
 
         while np.sum((self.f(self.x, params)-self.y)**2) - \
@@ -132,7 +134,7 @@ class GaussNewtonSolver(object):
             if iter_cnt >max_iter:
                 print("Max iteration reached for line search!")
                 break
-        print("Linear Search complete")
+
         return t
 
 
@@ -191,21 +193,19 @@ class GaussNewtonSolver(object):
         Returns:
             - J: array-like, Jacobian matrix
         """  
-        # print("Computing jacobian")
-        # self.checkValues()
+
         m = len(params)
         M = len(self.y)
 
         # broadcasting
         params_mat = params[:,np.newaxis] + np.zeros((m, m))
 
-        # print(params_mat)
+
 
         # creating theta+h and theta-h for finite difference
         params_plus = params_mat + np.eye(m) * step
         params_minus = params_mat - np.eye(m) * step
 
-        # print(params_plus)
 
         # computing f(theta+h) and f(theta-h)
         y_plus = np.zeros((M, m))
@@ -220,16 +220,11 @@ class GaussNewtonSolver(object):
         J = (y_plus - y_minus) / (2 * step)
 
         # can comment out the following line to improve performance
-        assert J.shape==(M, m), f"J has a shape of {J.shape}"
+        # assert J.shape==(M, m), f"J has a shape of {J.shape}"
     
 
         return J
 
-    # def checkValues(self):
-    #     """Checks if the values are initialized."""
-    #     assert self.params is not None \
-    #         and self.x is not None\
-    #         and self.y is not None, "Must fit model first!"
 
     @staticmethod
     def jacobian(f, x, params, step=1e-4):
@@ -279,4 +274,9 @@ class GaussNewtonSolver(object):
         # print("Computing dk")
 
         return pinv(J.T@J)@J.T
-    
+
+    # def checkValues(self):
+    #     """Checks if the values are initialized."""
+    #     assert self.params is not None \
+    #         and self.x is not None\
+    #         and self.y is not None, "Must fit model first!"
