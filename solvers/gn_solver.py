@@ -16,7 +16,9 @@ class GaussNewtonSolver(object):
     - Find optimal parameters theta
     """
 
-    def __init__(self, f, max_iter=100, step=1e-4, verbose = True):
+    def __init__(self, f, max_solver_iter=100, step=1e-4, 
+                    max_line_search_iter=3,
+                    verbose = True):
 
         """
         Initializes the solver.   
@@ -26,13 +28,15 @@ class GaussNewtonSolver(object):
                  and theta (the parameter vector),
                  returns y of shape (2n(2N+1), ) as a flattened array 
                  (the 2 comes from x and y coordinates)
-            - max_iter: int, maximum iterations
+            - max_solver_iter: int, maximum iterations
             - step: float, step size for numerical differentiation
+            - max_line_search_iter: int, maximum iterations for line search
             - verbose: bool, decides whether to print progress
         """  
-        self.max_iter = max_iter
+        self.max_iter = max_solver_iter
         self.f = f
         self.step = step
+        self.max_line= max_line_search_iter
         self.verbose = verbose
         # the attributes to be initialized later
         self.init_guess = None
@@ -67,7 +71,7 @@ class GaussNewtonSolver(object):
         for i in tqdm(range(self.max_iter)):
             # print  
             if self.verbose:
-                print(f"Starting trial {i}")
+                print(f"Starting trial {i+1}")
             # compute fitted values  
             y_fitted = self.f(x, self.params)
 
@@ -80,12 +84,17 @@ class GaussNewtonSolver(object):
             dk = self._dK(jacobian)@residual
 
             # line search
-            t = self.line_search(self.params, t, dk, alpha, beta)
+            t = self.line_search(self.params, t, dk, alpha, beta, 
+                                    max_iter=self.max_line)
 
             # update parameters
-            print("Updating parameters")
+            # print("Updating parameters")
             self.params = self.params + t * dk
-
+            print(t)
+            print(dk)
+            
+            if self.verbose:
+                print(f"After trial {i+1}, parameters are {self.params}")
             # terminate when gradient < tolerance eps
             if np.linalg.norm(self.loss_J) < eps:
                 print("Threshold reached!")
@@ -138,7 +147,10 @@ class GaussNewtonSolver(object):
         Returns:
             - J: array-like, Jacobian matrix of loss function  wrt. params
         """       
-        print("Computing loss jacobian")
+        # uncomment this line if need to print
+
+        # print("Computing loss jacobian")
+
         # self.checkValues()
         m = len(params)
 
@@ -159,7 +171,7 @@ class GaussNewtonSolver(object):
 
         # computing the jacobian
         J = (y_plus - y_minus) / (2 * step)
-        print(J.shape)
+        # print(J.shape)
         self.loss_J = J
         return J
 
@@ -179,7 +191,7 @@ class GaussNewtonSolver(object):
         Returns:
             - J: array-like, Jacobian matrix
         """  
-        print("Computing jacobian")
+        # print("Computing jacobian")
         # self.checkValues()
         m = len(params)
         M = len(self.y)
@@ -209,7 +221,8 @@ class GaussNewtonSolver(object):
 
         # can comment out the following line to improve performance
         assert J.shape==(M, m), f"J has a shape of {J.shape}"
-        
+    
+
         return J
 
     # def checkValues(self):
@@ -263,7 +276,7 @@ class GaussNewtonSolver(object):
         Returns:
             - dk: array-like, (J^T J)^{-1} J^T        
         """  
-        print("Computing dk")
+        # print("Computing dk")
 
         return pinv(J.T@J)@J.T
     
