@@ -79,8 +79,12 @@ class WindowData(object):
         inputs = arr[:, self.input_slice, :]
         labels = arr[:, self.labels_slice, :]
 
-        inputs.set_shape([None, self.input_width, None])  
-        labels.set_shape([None, self.label_width, None])
+        # print(inputs.shape, labels.shape)
+
+        inputs.set_shape([None, self.input_width, None, None])  
+        labels.set_shape([None, self.label_width, None, None])
+
+        # print(inputs.shape, labels.shape)
 
         return inputs, labels
 
@@ -97,6 +101,7 @@ class WindowData(object):
             - dataset: tf.data.Dataset, the dataset.
         
         """  
+        data = np.array(data, dtype=np.float32)
         assert isinstance(data, np.ndarray), 'data must be a numpy array'
 
         dataset = tf.keras.utils.timeseries_dataset_from_array(
@@ -112,16 +117,20 @@ class WindowData(object):
 
         return dataset
 
-    @property
+    # @property
     def make_train(self, batch_size=32, shuffle=False):
         return self.make_dataset(self.train_ds, batch_size, shuffle)
 
-    @property
+    # @property
     def make_val(self, batch_size=32, shuffle=False):
         return self.make_dataset(self.val_ds, batch_size, shuffle)
 
-    @property
+    # @property
     def make_test(self, batch_size=32, shuffle=False):
         return self.make_dataset(self.test_ds, batch_size, shuffle)
+
+    @property
+    def num_points(self):
+        return self.train_ds.shape[1]
 
     
