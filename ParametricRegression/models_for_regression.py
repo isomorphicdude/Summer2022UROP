@@ -3,7 +3,7 @@
 import numpy as np
 from tqdm import tqdm
 
-from models import *
+from models.models import *
 from solvers.rk_solvers import rk2
 
 

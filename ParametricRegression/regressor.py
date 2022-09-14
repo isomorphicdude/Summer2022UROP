@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 from solvers.euler import *
 from solvers.rk_solvers import *
-from regression.models_for_regression import *
+from ParametricRegression.models_for_regression import *
 from solvers.gn_solver import GaussNewtonSolver  
 
 

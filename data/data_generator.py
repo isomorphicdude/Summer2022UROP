@@ -4,8 +4,8 @@ import os
 import time
 import numpy as np
 
-from helper import *
-from models import *
+from models.helper import *
+from models.models import *
 from solvers.euler import *
 from solvers.rk_solvers import *
 
