@@ -51,3 +51,26 @@ class embedder(tf.keras.layers.Layer):
 
         outputs = h + self.embed_bias
         return outputs
+
+
+
+
+# lstm_model_1 = tf.keras.models.Sequential([
+#     tf.keras.layers.Input((10,21,2)),
+#     embedder((10,21,2), embedding_size, batch_size=32),
+#     # tf.keras.layers.Reshape((10, 21*embedding_size)),
+#     tf.keras.layers.LSTM(2*embedding_size, return_sequences=False),
+#     tf.keras.layers.Dense(
+#         tfpl.MixtureSameFamily.params_size(
+#             num_components = window1.num_points,
+#             component_params_size = tfpl.MultivariateNormalTriL.params_size(2) # x,y coordinates
+#         ), 
+#         activation=None
+#     ),
+#     tfpl.MixtureSameFamily(
+#         num_components = window1.num_points,
+#         component_layer = tfpl.MultivariateNormalTriL(
+#             2, # x,y coordinates
+#         )
+#     )
+# ])
