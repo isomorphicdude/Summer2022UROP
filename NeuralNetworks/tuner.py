@@ -4,7 +4,7 @@ import keras_tuner
 import numpy as np
 import tensorflow as tf 
 
-from models import model_builder_basket, getModel
+from models.models import getModel
 
 
 ##################################################################################################
@@ -73,24 +73,17 @@ class customTuner(keras_tuner.RandomSearch):
         Args:  
             - input_shape: the shape of the input data
             - output_shape: the shape of the output data
-            - dim: int, the dimension of basket, default None
-            - basket: bool, whether to use basket model or not, default False
         """  
         global input_shape_glob
-        global dim_glob
         global output_shape_glob
-        global basket_glob
 
         super(customTuner, self).__init__(**kwargs)
         self.input_shape = input_shape
         self.output_shape = output_shape
-        self.dim = dim  
-        self.basket = basket
 
         input_shape_glob = input_shape
-        dim_glob = dim
         output_shape_glob = output_shape
-        basket_glob = basket
+
 
     def run_trial(self, trial, train_ds, valid_ds, epochs, **kwargs):
         # overrides the run_trial method of the RandomSearch class
