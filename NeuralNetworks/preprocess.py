@@ -26,6 +26,7 @@ def getDatasets(dataframe, scaling = True):
         train = minmax_scaler.fit_transform(train)
         val = minmax_scaler.transform(val)
         test = minmax_scaler.transform(test)
+
     print(train.shape, val.shape, test.shape)
     train_ds = tf.data.Dataset.from_tensor_slices(tf.cast(train, tf.float32))
     valid_ds = tf.data.Dataset.from_tensor_slices(tf.cast(val, tf.float32))

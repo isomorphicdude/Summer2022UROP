@@ -7,12 +7,14 @@ from sklearn.preprocessing import normalize, MinMaxScaler
 minmax_scaler = MinMaxScaler()
 
 
-def getDatasets(dataframe, scaling = True):
+def getDatasets(dataframe, scaling = True, return_ndarray = False):
     """
     Returns tuple of scaled train, valid, and test datasets.  
 
     Args:
         - dataframe: ndarray, dataframe of the data  
+        - scaling: boolean, whether to scale the data
+        - return_ndarray: boolean, whether to return the datasets as ndarray, default is False
 
     Output:  
         - (train_ds, valid_ds, test_ds): tuple of datasets which are between 0 and 1
@@ -27,9 +29,16 @@ def getDatasets(dataframe, scaling = True):
         val = minmax_scaler.transform(val)
         test = minmax_scaler.transform(test)
     print(train.shape, val.shape, test.shape)
-    train_ds = tf.data.Dataset.from_tensor_slices(tf.cast(train, tf.float32))
-    valid_ds = tf.data.Dataset.from_tensor_slices(tf.cast(val, tf.float32))
-    test_ds  = tf.data.Dataset.from_tensor_slices(tf.cast(test, tf.float32))
+
+    if not return_ndarray:
+        train_ds = tf.data.Dataset.from_tensor_slices(tf.cast(train, tf.float32))
+        valid_ds = tf.data.Dataset.from_tensor_slices(tf.cast(val, tf.float32))
+        test_ds  = tf.data.Dataset.from_tensor_slices(tf.cast(test, tf.float32))
+    else:
+        train_ds = train
+        valid_ds = val
+        test_ds = test
+
     return (train_ds, valid_ds, test_ds)
 
 
