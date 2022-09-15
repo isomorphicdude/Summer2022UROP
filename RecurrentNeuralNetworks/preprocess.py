@@ -7,7 +7,7 @@ from sklearn.preprocessing import normalize, MinMaxScaler
 minmax_scaler = MinMaxScaler()
 
 
-def getDatasets(dataframe, scaling = True, return_ndarray = False):
+def getDatasets(dataframe, scaling = True, return_ndarray = False, shuffle=False):
     """
     Returns tuple of scaled train, valid, and test datasets.  
 
@@ -15,13 +15,16 @@ def getDatasets(dataframe, scaling = True, return_ndarray = False):
         - dataframe: ndarray, dataframe of the data  
         - scaling: boolean, whether to scale the data
         - return_ndarray: boolean, whether to return the datasets as ndarray, default is False
+        - shuffle: boolean, whether to shuffle the data, default is False
 
     Output:  
         - (train_ds, valid_ds, test_ds): tuple of datasets which are between 0 and 1
     
     """
     N = len(dataframe)
-    indices = np.random.permutation(N)
+    indices = np.array(range(0,N))
+    if shuffle:
+        indices = np.random.permutation(N)
     train, val, test = np.split(dataframe[indices], [int(.8*N), int(.9*N)])
     # add normalizing layer here
     if scaling:
