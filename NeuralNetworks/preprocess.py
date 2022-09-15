@@ -20,7 +20,7 @@ def getDatasets(dataframe, scaling = True, shuffle=False):
     
     """
     N = len(dataframe)
-    indices = range(N)
+    indices = np.array(range(0,N))
     if shuffle:
         indices = np.random.permutation(N)
     train, val, test = np.split(dataframe[indices], [int(.8*N), int(.9*N)])

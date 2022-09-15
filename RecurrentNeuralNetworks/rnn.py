@@ -55,7 +55,8 @@ class embedder(tf.keras.layers.Layer):
         return outputs
 
 
-
+class vanillaLSTM(tf.keras.Model):
+    pass
 
 # lstm_model_1 = tf.keras.models.Sequential([
 #     tf.keras.layers.Input((10,21,2)),
