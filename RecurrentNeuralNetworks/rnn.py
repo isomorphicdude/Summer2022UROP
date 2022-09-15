@@ -9,7 +9,7 @@ from tensorflow.keras.models import Sequential
 
 class embedder(tf.keras.layers.Layer):
 
-    def __init__(self, input_dim, embedding_dim, batch_size, **kwargs):
+    def __init__(self, input_dim, embedding_dim, batch_size=32, **kwargs):
         """
         Initializes the class.
 
@@ -25,9 +25,11 @@ class embedder(tf.keras.layers.Layer):
         self.batch_size = batch_size
 
     def build(self, input_shape):
+        # shape of (10,21,64,2) to multiply with (batch_size, 10,21,2,1)
+        # shape of (a,b,e,c) to multiply with (z,a,b,c,d) to get (z,a,b,e,d)
         self.embed_mat = self.add_weight(name='embedding_matrix',
                                          shape=(
-                                                self.batch_size,
+                                                # self.batch_size,
                                                 self.input_dim[0], 
                                                 self.input_dim[1],
                                                 self.embedding_dim,
@@ -45,10 +47,10 @@ class embedder(tf.keras.layers.Layer):
 
     def call(self, inputs):
         h = inputs[...,tf.newaxis]
-        h = tf.einsum('zabcd,zabec->zabed', h, self.embed_mat)
-        # h = tf.keras.layers.Reshape((-1, self.input_dim[0], self.input_dim[1]*self.embedding_dim))(h)
+        h = tf.einsum('zabcd,abec->zabed', h, self.embed_mat)
+        # print(h.shape)
         h = tf.keras.layers.Reshape((self.input_dim[0], self.input_dim[1]*self.embedding_dim))(h)
-
+        # print(h.shape)
         outputs = h + self.embed_bias
         return outputs
 
