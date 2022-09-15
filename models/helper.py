@@ -90,10 +90,10 @@ def multiPlot(case,
       - N: no. of prey   
     - sample_points: list, times to plot
     - size: int, fig size
-    - axis_lim: int, set limits of axes to [-n, n]
+    - axis_lim: int, set limits of axes to [-n, n], default to None
     - second_order: bool, return a second order with velocity or not,
-                    if true, return with velocity zero    
-    - quiver: bool, determine if return quiver plot when velocity is provided
+                    if true, return with velocity zero, default to True    
+    - quiver: bool, determine if return quiver plot when velocity is provided, default to False
   '''  
   soln, h, N = case
   n = len(sample_points)
